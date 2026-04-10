@@ -25,20 +25,3 @@ See `docs/RECEIPT_CANONICALIZATION.md` and `tests/fixtures/canonicalization`.
 ## Deployment reminder
 
 Before end-to-end testing on live infra, ensure `ANCHOR_CONTRACT_ADDRESS` is set in deployment environment variables.
-
-
-### CLI local run quickstart
-
-From `cli/inntris-verify-promptfoo`:
-
-```bash
-npm install
-npm run build
-node dist/src/index.js --help
-```
-
-Or use the helper script:
-
-```bash
-npm run cli -- --help
-```
