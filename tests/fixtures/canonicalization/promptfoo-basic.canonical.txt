@@ -1,0 +1,1 @@
+{"action_type":"promptfoo_eval","payload":{"results_hash":"abc123","summary":{"failed":1,"passed":9,"total":10}},"policy_hash":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
