@@ -11,6 +11,26 @@ function sha256Hex(input: Uint8Array): string {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 
+async function tryRegister(apiUrl: string, email: string | undefined, publicKeyB64: string): Promise<Response> {
+  // Primary: shared foundation endpoint schema expects `public_key`
+  let res = await fetch(`${apiUrl}/public/agents/register-promptfoo`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email, public_key: publicKeyB64 })
+  });
+
+  // Backward compatibility for deployments expecting `public_key_b64`
+  if (res.status === 422) {
+    res = await fetch(`${apiUrl}/public/agents/register-promptfoo`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, public_key_b64: publicKeyB64 })
+    });
+  }
+
+  return res;
+}
+
 export async function runInit(args: string[]) {
   const email = argValue(args, '--email');
   const apiUrl = argValue(args, '--api-url') || process.env.INNTRIS_API_URL || 'https://api.inntris.com';
@@ -20,11 +40,7 @@ export async function runInit(args: string[]) {
   const public_key_b64 = Buffer.from(publicKey).toString('base64');
   const localFingerprint = sha256Hex(publicKey);
 
-  const res = await fetch(`${apiUrl}/public/agents/register-promptfoo`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email, public_key_b64 })
-  });
+  const res = await tryRegister(apiUrl, email, public_key_b64);
 
   if (!res.ok) throw new Error(`register failed: ${res.status} ${await res.text()}`);
   const body = await res.json() as { agent_id: string; org_id?: string; public_key_fingerprint?: string };
