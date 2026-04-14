@@ -1,0 +1,17 @@
+name: placeholder-guard
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check-placeholders:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if seeded placeholders remain
+        run: |
+          if grep -nE "SEED_(AUDIT_ID|TX_HASH|MERKLE_ROOT)_PLACEHOLDER" frontend/src/app/promptfoo/_demo-receipt.ts; then
+            echo "Replace seeded placeholder receipt values before release";
+            exit 1;
+          fi
